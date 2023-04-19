@@ -1,8 +1,8 @@
 import Analytics from 'analytics-node';
-import { isStyledComponent } from "styled-components";
-import { nanoid } from 'nanoid';
-import { debounce, get, split, truncate } from 'lodash';
 import { createHash } from 'crypto';
+import { debounce, get, split, truncate } from 'lodash';
+import { isStyledComponent } from "styled-components";
+import { useAccountId } from "./account";
 
 let segment;
 let anonymousUserId;
@@ -20,16 +20,17 @@ function getAnonymousId() {
   }
 
   const storageId = localStorage.getItem('anonymousUserId');
-  userIdCreatedAt = localStorage.getItem('anonymousUserIdCreatedAt');
-
   if (storageId) {
     anonymousUserId = storageId;
-  } else {
-    anonymousUserId = nanoid();
-    userIdCreatedAt = new Date().toUTCString()
-    localStorage.setItem('anonymousUserId', anonymousUserId);
-    localStorage.setItem('anonymousUserIdCreatedAt', userIdCreatedAt);
+    return anonymousUserId;
   }
+  
+  const accountId = useAccountId();
+  const hashedAccountId = getAccountIdHashID(accountId);
+  anonymousUserId = hashedAccountId;
+  userIdCreatedAt = new Date().toUTCString();
+  localStorage.setItem('anonymousUserId', anonymousUserId);
+  localStorage.setItem('anonymousUserIdCreatedAt', userIdCreatedAt);
 
   return anonymousUserId;
 }
