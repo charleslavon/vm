@@ -1,11 +1,18 @@
 import Analytics from 'analytics-node';
 import { isStyledComponent } from "styled-components";
 import { nanoid } from 'nanoid';
-import { debounce, get, split, truncate } from 'lodash'
+import { debounce, get, split, truncate } from 'lodash';
+import { createHash } from 'crypto';
 
 let segment;
 let anonymousUserId;
 let userIdCreatedAt;
+
+export function getAccountIdHashID(accountId) {
+  const hash = createHash('sha512');
+  hash.update(accountId);
+  return hash.digest('hex');
+}
 
 function getAnonymousId() {
   if (anonymousUserId) {
